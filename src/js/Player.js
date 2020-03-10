@@ -2,6 +2,9 @@ class Player {
   constructor(n = "Paco", l = 10) {
     this.name = n;
     this.life = l;
+    this.x = 0;
+    this.y = 0;
+    this.z = 0;
   }
 
   static getType() {

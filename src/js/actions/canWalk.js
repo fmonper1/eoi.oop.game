@@ -1,5 +1,5 @@
-const canSay = msg => ({
-  say: () => console.log(msg)
+const canWalk = state => ({
+  walk: () => console.log(state)
 });
 
-module.exports = canSay;
+module.exports = canWalk;
