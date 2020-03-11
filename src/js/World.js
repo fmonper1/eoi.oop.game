@@ -1,13 +1,14 @@
-let Player = require("./PlayerComposition");
+const Player = require("./PlayerComposition");
+const Wizard = require("./Wizard");
 
-class World {
-  constructor() {
-    this.player1 = Player();
-  }
-}
+const World = () => {
+  let player1 = Player();
+  let enemy1 = Wizard();
+};
 
-const world = new World();
+const gameWorld = World();
+
 setInterval(() => {
-  world.player1.envejecer();
+  gameWorld.player1.envejecer();
   console.log(world.player1);
 }, 2000);

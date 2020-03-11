@@ -1,14 +1,25 @@
-class Wizard extends Player {
-  constructor(name, health, type = "fire") {
-    super(name, health);
-    this.type = type;
-  }
+let canSay = require("./actions/canSay");
+let canGrowOlder = require("./actions/canGrowOlder");
+let canHeal = require("./actions/canHeal");
+let canAttack = require("./actions/canAttack");
 
-  static getType() {
-    return "ENEMY";
-  }
+const Wizard = (name = "Paco", hitpoints = 10, type = "fire") => {
+  let state = {
+    name,
+    hitpoints,
+    type,
+    x: 0,
+    y: 0,
+    z: 0
+  };
 
-  fly() {}
-}
+  return Object.assign(
+    state,
+    canGrowOlder(state),
+    canHeal(state),
+    canSay(state),
+    canAttack(state)
+  );
+};
 
 module.exports = Wizard;
