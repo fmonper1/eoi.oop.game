@@ -1,78 +1,102 @@
 const fetch = require("../../../node_modules/node-fetch");
-
 let gameObject = {
-  dealer: [],
   players: [],
+  lastPlayerIndex: 0,
   houseCards: [],
   deck: {},
-  numOfPlayers: 4
+  numOfPlayers: 4,
+  playersLeft: 4
 };
 
-const setupPlayers = (game, body) => {
+const startGame = gameObject => {
+  return fetch("https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=6")
+    .then(res => res.json())
+    .then(body => {
+      gameObject.deck = body;
+      return gameObject;
+    })
+    .then(game => setupPlayers(game))
+    .then(game => drawFirstRound(game))
+    .then(game => {
+      console.log("last", game);
+      return game;
+    });
+};
+
+const setupPlayers = game => {
   return new Promise((resolve, reject) => {
     console.log("setup players", game);
 
-    game.deck = body;
-    game.players = new Array(game.numOfPlayers).fill([]);
+    game.players = new Array(game.numOfPlayers).fill({
+      cards: [],
+      score: 0,
+      isBusted: false
+    });
     resolve(game);
   });
 };
 
-const drawTwoCards = (game, player) => drawCard(game, player, 2, false);
-const dealerDrawTwoCards = game => drawCard(game, 0, 2, true);
-const drawOneCard = (game, player) => drawCard(game, player, 1, false);
-const dealerDrawOneCard = game => drawCard(game, 0, 1, true);
+const drawFirstRound = async game => {
+  for (let i = 0; i < game.numOfPlayers; i++) {
+    console.log("drawFirstRound", i, game.players[i]);
+    game.players[i].cards = await drawCard(game, 2);
+    console.log("drawFirstRound", i, game.players[i]);
+  }
+  // game.players.map((player, index) =>
+  //   drawCard(game, 2).then(result => (player.cards = result.cards))
+  // );
+};
 
-const drawCard = (game, player, numOfCards, isDealer) => {
+const drawCard = (game, numOfCards) => {
+  console.log("drawCard", game, numOfCards);
   return new Promise((resolve, reject) => {
-    console.log("drawcard-gameparam", game);
     fetch(
       `https://deckofcardsapi.com/api/deck/${game.deck.deck_id}/draw/?count=${numOfCards}`
     )
       .then(res => res.json())
       .then(body => {
         console.log(body);
-        console.log(player);
-        if (isDealer) {
-          game.houseCards = game.houseCards.concat(body.cards);
-          game.deck.remaining = body.remaining;
-          renderCard(`dealer`, body.cards);
-        } else {
-          game.players[player] = game.players[player].concat(body.cards);
-          game.deck.remaining = body.remaining;
-          renderCard(`player-${player}`, body.cards);
-        }
-        resolve(game);
+        resolve(body.cards);
       });
   });
 };
 
+const addCardsToUsersDeck = (game, playerIndex, cards) => {
+  console.log(game.players[playerIndex]);
+  game.players[playerIndex].cards = game.players[playerIndex].cards.concat(
+    cards
+  );
+};
+
+const checkCardSumTotal = (game, lastPlayerIndex) => {};
+
 const renderCard = (id, cards) => {
   const playerCards = document.getElementById(id);
+
   cards.forEach(card => {
     let img = document.createElement("img");
     img.src = card.images.png;
-    img.width = 50;
-    playerCards.appendChild(img);
+    img.classList = "card-img";
+    img.display = "block";
+
+    return playerCards.appendChild(img);
   });
 };
 
-const drawFirstRound = async game => {
-  for (let i = 0; i < game.players.length; i++) {
-    let gameObject = game;
-    await drawTwoCards(gameObject, i);
-  }
-  await dealerDrawTwoCards(gameObject);
+const startGameBtn = document.getElementById("startGame");
+startGameBtn.addEventListener("click", async () => {
+  startGameBtn.hidden = "true";
+});
 
-  return game;
-};
+const drawCardBtn = document.getElementById("drawCard");
+drawCardBtn.addEventListener("click", () => {
+  drawOneCard(gameObject, gameObject.lastPlayerIndex);
+});
 
-fetch("https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=6")
-  .then(res => res.json())
-  .then(body => setupPlayers(gameObject, body))
-  .then(game => drawFirstRound(game))
-  .then(game => drawOneCard(game, 1))
-  .then(game => {
-    console.log("last", game);
-    console.log("last", game.players[0]);
-  });
+const endTurnBtn = document.getElementById("endTurn");
+endTurnBtn.addEventListener("click", () => {
+  gameObject.lastPlayerIndex++;
+});
+
+console.log("gameObject", gameObject);
+gameObject = startGame(gameObject);

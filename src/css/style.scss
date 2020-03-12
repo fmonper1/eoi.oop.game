@@ -1,0 +1,24 @@
+.card-img {
+  max-width: 50px;
+  border: 1px solid red;
+  margin: 5px;
+}
+
+#table {
+  display: flex;
+  flex-direction: column;
+  max-width: 960px;
+  margin: 0 auto;
+
+  background: url("../assets/green-bg.jpg") center;
+  background-size: 200px 200px;
+}
+
+#bottom {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  & > div {
+    width: 220px;
+  }
+}
