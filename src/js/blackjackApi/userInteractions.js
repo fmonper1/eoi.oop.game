@@ -7,7 +7,7 @@ export const endTurnButton = game => {
     console.log("endTurnButton() game is equal to", game, typeof game);
 
     // return finishTurn(game);
-    return game.then(game => finishTurn(game));
+    return finishTurn(game);
   });
 };
 
@@ -19,12 +19,3 @@ export const drawCardButton = game => {
     return drawCardLogic(game);
   });
 };
-
-// const dealerFinalHand = game => {
-//   if (game.lastPlayerIndex === game.numOfPlayers) {
-//     while (game.players[game.numOfPlayers].score < 16) {
-//       return drawCardLogic(game);
-//     }
-//   }
-//   return game;
-// };

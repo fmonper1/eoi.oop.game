@@ -18,7 +18,16 @@ export const startGame = game => {
     .then(game => game);
 };
 
-const setupPlayers = game => {
+export const setupDeckData = game => {
+  return fetch("https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=6")
+    .then(res => res.json())
+    .then(body => {
+      game.deck = body;
+      return game;
+    });
+};
+
+export const setupPlayers = game => {
   game.players = new Array(game.numOfPlayers + 1).fill().map(() => ({
     cards: [],
     score: 0,
@@ -33,7 +42,7 @@ const setupPlayers = game => {
 
 // I add one so that in the last iteration
 // we can give the dealer its cards
-const drawFirstRound = async game => {
+export const drawFirstRound = async game => {
   for (let i = 0; i < game.numOfPlayers + 1; i++) {
     let cardsFromApi = await getCardFromApi(game, 2);
 
@@ -119,7 +128,16 @@ export const finishTurn = game => {
 
   if (game.lastPlayerIndex === game.numOfPlayers) {
     console.log("game cuando es el turno del dealer", game);
-    // return dealerFinalHand(game);
+    game = dealerFinalHand(game);
+  }
+  return game;
+};
+
+const dealerFinalHand = game => {
+  if (game.lastPlayerIndex === game.numOfPlayers) {
+    while (game.players[game.numOfPlayers].score < 16) {
+      return drawCardLogic(game);
+    }
   }
   return game;
 };
@@ -131,13 +149,14 @@ export const isBusted = game => {
   return game;
 };
 
-export const drawCardLogic = game => {
+export const drawCardLogic = async game => {
   console.log("drawCardLogic() game is equal to", game, typeof game);
 
-  return game
-    .then(game => drawCard(game))
-    .then(game => updateTotalScore(game))
-    .then(game => isBusted(game))
-    .then(game => renderPlayerScore(game))
-    .then(game => finishTurnIfBusted(game));
+  game = await drawCard(game);
+  game = updateTotalScore(game);
+  game = isBusted(game);
+  game = renderPlayerScore(game);
+  game = finishTurnIfBusted(game);
+
+  return game;
 };
