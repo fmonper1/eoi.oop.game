@@ -11,34 +11,34 @@
   <body>
     <div id="table">
       <div id="top">
-        <div id="dealer"><h2>dealer</h2></div>
+        <div id="player-dealer" class="playerHand"><h2>dealer</h2></div>
       </div>
       <div id="bottom">
-        <div id="player-0">
+        <div id="player-0" class="playerHand">
           <h2>
             player0
             <div class="score"></div>
           </h2>
         </div>
-        <div id="player-1">
+        <div id="player-1" class="playerHand">
           <h2>
             player1
             <div class="score"></div>
           </h2>
         </div>
-        <div id="player-2">
+        <div id="player-2" class="playerHand">
           <h2>
             player2
             <div class="score"></div>
           </h2>
         </div>
-        <div id="player-3">
+        <div id="player-3" class="playerHand">
           <h2>
             player3
             <div class="score"></div>
           </h2>
         </div>
-        <div id="player-4">
+        <div id="player-4" class="playerHand">
           <h2>
             player4
             <div class="score"></div>
@@ -46,9 +46,11 @@
         </div>
       </div>
     </div>
-    <button id="startGame" onclick="">Start Game</button>
-    <button id="drawCard">Draw Card</button>
-    <button id="endTurn">End Turn</button>
+    <div id="btnGroup">
+      <!-- <button id="startGame" onclick="">Start Game</button> -->
+      <button id="drawCard" class="btn">Draw Card</button>
+      <button id="endTurn" class="btn">End Turn</button>
+    </div>
     <script src="js/blackjackApi/index.js"></script>
   </body>
 </html>
