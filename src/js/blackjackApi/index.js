@@ -5,10 +5,8 @@ import fetch from "node-fetch";
 let gameObject = {
   players: [],
   lastPlayerIndex: 0,
-  dealer: { cards: [], score: 0, isBusted: false },
   deck: {},
-  numOfPlayers: 4,
-  playersLeft: 4 //no hace nada por ahora
+  numOfPlayers: 4
 };
 
 const startGame = gameObject => {
@@ -70,12 +68,7 @@ const drawFirstRound = async game => {
     renderCard(isDealer, game.players[i].cards);
     renderPlayerScore(game);
   }
-  // game.lastPlayerIndex++;
-  // game.dealer.cards = await getCardFromApi(game, 2);
-  // game.dealer.score = calculatePlayerTotalScore(game.dealer.cards);
 
-  // renderCard("dealer", game.dealer.cards);
-  // renderPlayerScore(game);
   game.lastPlayerIndex = 0;
   return game;
 };
@@ -95,7 +88,11 @@ const drawCard = async game => {
   let i = game.lastPlayerIndex;
   const newCard = await getCardFromApi(game, 1);
   game.players[i].cards = game.players[i].cards.concat(newCard);
-  renderCard(i, newCard);
+  let isDealer =
+    game.lastPlayerIndex === game.numOfPlayers
+      ? "dealer"
+      : game.lastPlayerIndex;
+  renderCard(isDealer, newCard);
   return game;
 };
 
@@ -123,9 +120,7 @@ const renderCard = (id, cards) => {
   });
 };
 
-// console.log("gameObject", gameObject);
 let bjGame = startGame(gameObject);
-// console.log("gameObject", gameObject);
 
 const renderPlayerScore = game => {
   let playerIdentifier =
