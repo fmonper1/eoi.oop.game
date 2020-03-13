@@ -9,52 +9,58 @@
     <link rel="stylesheet" type="text/css" src="./css/custom.css" />
   </head>
   <body>
+    <div id="btnGroup">
+      <!-- <button id="startGame" onclick="">Start Game</button> -->
+      <button id="drawCard" class="btn">Draw Card</button>
+      <button id="endTurn" class="btn">End Turn</button>
+    </div>
     <div id="table">
       <div id="top">
         <div id="player-dealer" class="playerHand">
           <h2>
             dealer
             <div id="player-dealer-score" class="score"></div>
+            <div id="player-dealer-cards"></div>
           </h2>
         </div>
       </div>
       <div id="bottom">
         <div id="player-0" class="playerHand">
           <h2>
+            <div id="player-0-score" class="score">0</div>
             player0
-            <div id="player-0-score" class="score"></div>
           </h2>
+          <div id="player-0-cards"></div>
         </div>
         <div id="player-1" class="playerHand">
           <h2>
+            <div id="player-1-score" class="score">0</div>
             player1
-            <div id="player-1-score" class="score"></div>
           </h2>
+          <div id="player-1-cards"></div>
         </div>
         <div id="player-2" class="playerHand">
           <h2>
+            <div id="player-2-score" class="score">0</div>
             player2
-            <div id="player-2-score" class="score"></div>
           </h2>
+          <div id="player-2-cards"></div>
         </div>
         <div id="player-3" class="playerHand">
           <h2>
+            <div id="player-3-score" class="score">0</div>
             player3
-            <div id="player-3-score" class="score"></div>
           </h2>
+          <div id="player-3-cards"></div>
         </div>
-        <div id="player-4" class="playerHand">
+        <!-- <div id="player-4" class="playerHand">
           <h2>
+            <div id="player-4-score" class="score">0</div>
             player4
-            <div id="player-4-score" class="score"></div>
           </h2>
-        </div>
+          <div id="player-4-cards"></div>
+        </div> -->
       </div>
-    </div>
-    <div id="btnGroup">
-      <!-- <button id="startGame" onclick="">Start Game</button> -->
-      <button id="drawCard" class="btn">Draw Card</button>
-      <button id="endTurn" class="btn">End Turn</button>
     </div>
     <script src="js/blackjackApi/index.js"></script>
   </body>

@@ -85,7 +85,7 @@ const getCardFromApi = (game, numOfCards) => {
 };
 
 export const renderCardInWebsite = (id, cards) => {
-  const playerCards = document.getElementById(`player-${id}`);
+  const playerCards = document.getElementById(`player-${id}-cards`);
 
   cards.forEach(async card => {
     let img = document.createElement("img");
