@@ -183,7 +183,6 @@ endTurnBtn.addEventListener("click", () => {
 
   bjGame = bjGame.then(game => finishTurn(game));
 });
-
 const isBusted = game => {
   if (game.players[game.lastPlayerIndex].score > 21) {
     game.players[game.lastPlayerIndex].isBusted = true;
