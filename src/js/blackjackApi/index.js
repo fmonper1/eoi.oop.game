@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
 
-//TODO: Se hacen muchas llamadas a la api: deberia hacer una y guardarlas en un array
+// TODO: Se hacen muchas llamadas a la api: deberia hacer una y guardarlas en un array
 
 let gameObject = {
   players: [],
@@ -8,7 +8,7 @@ let gameObject = {
   dealer: { cards: [], score: 0, isBusted: false },
   deck: {},
   numOfPlayers: 4,
-  playersLeft: 4
+  playersLeft: 4 //no hace nada por ahora
 };
 
 const startGame = gameObject => {
@@ -26,11 +26,13 @@ const startGame = gameObject => {
 const setupPlayers = game => {
   return new Promise((resolve, reject) => {
     // console.log("setup players", game);
-    game.players = new Array(game.numOfPlayers).fill().map(() => ({
+    game.players = new Array(game.numOfPlayers + 1).fill().map(() => ({
       cards: [],
       score: 0,
-      isBusted: false
+      isBusted: false,
+      isDealer: false
     }));
+    game.players[game.numOfPlayers].isDealer = true;
     resolve(game);
   });
 };
@@ -44,9 +46,12 @@ const calculatePlayerTotalScore = cardsArray => {
 };
 
 const updateTotalScore = game => {
-  game.players[game.lastPlayerIndex].score = calculatePlayerTotalScore(
-    game.players[game.lastPlayerIndex].cards
-  );
+  let currentPlayer =
+    game.lastPlayerIndex === game.numOfPlayers
+      ? game.dealer
+      : game.players[game.lastPlayerIndex];
+
+  currentPlayer.score = calculatePlayerTotalScore(currentPlayer.cards);
   return game;
 };
 
@@ -61,8 +66,12 @@ const drawFirstRound = async game => {
     renderCard(i, game.players[i].cards);
     renderPlayerScore(game);
   }
+  game.lastPlayerIndex++;
   game.dealer.cards = await getCardFromApi(game, 2);
+  game.dealer.score = calculatePlayerTotalScore(game.dealer.cards);
+
   renderCard("dealer", game.dealer.cards);
+  renderPlayerScore(game);
   game.lastPlayerIndex = 0;
   return game;
 };
@@ -122,14 +131,23 @@ let bjGame = startGame(gameObject);
 // console.log("gameObject", gameObject);
 
 const renderPlayerScore = game => {
+  let playerIdentifier =
+    game.lastPlayerIndex === game.numOfPlayers
+      ? "dealer"
+      : game.lastPlayerIndex;
   const playerScoreDiv = document.getElementById(
-    `player-${game.lastPlayerIndex}-score`
+    `player-${playerIdentifier}-score`
   );
 
+  let currentPlayer =
+    playerIdentifier === "dealer"
+      ? game.dealer
+      : game.players[game.lastPlayerIndex];
   // console.log(playerScoreDiv);
-  playerScoreDiv.innerHTML = game.players[game.lastPlayerIndex].isBusted
+
+  playerScoreDiv.innerHTML = currentPlayer.isBusted
     ? "Busted"
-    : game.players[game.lastPlayerIndex].score;
+    : currentPlayer.score;
 
   return game;
 };
