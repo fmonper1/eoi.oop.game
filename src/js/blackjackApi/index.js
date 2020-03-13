@@ -1,4 +1,4 @@
-const fetch = require("../../../node_modules/node-fetch");
+import fetch from "node-fetch";
 
 //TODO: Se hacen muchas llamadas a la api: deberia hacer una y guardarlas en un array
 
@@ -25,8 +25,7 @@ const startGame = gameObject => {
 
 const setupPlayers = game => {
   return new Promise((resolve, reject) => {
-    console.log("setup players", game);
-
+    // console.log("setup players", game);
     game.players = new Array(game.numOfPlayers).fill().map(() => ({
       cards: [],
       score: 0,
@@ -36,22 +35,35 @@ const setupPlayers = game => {
   });
 };
 
+const calculatePlayerTotalScore = cardsArray => {
+  return cardsArray
+    .map(card => card.value)
+    .reduce(function(a, b = 0) {
+      return convertCardValueToInt(a) + convertCardValueToInt(b);
+    });
+};
+
+const updateTotalScore = game => {
+  game.players[game.lastPlayerIndex].score = calculatePlayerTotalScore(
+    game.players[game.lastPlayerIndex].cards
+  );
+  return game;
+};
+
 // I add one so that in the last iteration
 // we can give the dealer its cards
 const drawFirstRound = async game => {
   for (let i = 0; i < game.numOfPlayers; i++) {
+    game.lastPlayerIndex = i;
     let cardsFromApi = await getCardFromApi(game, 2);
-    let player = game.players[i];
-    player.cards = cardsFromApi;
-    player.score = player.cards
-      .map(card => card.value)
-      .reduce(function(a, b = 0) {
-        return convertCardValueToInt(a) + convertCardValueToInt(b);
-      });
+    game.players[i].cards = cardsFromApi;
+    game.players[i].score = calculatePlayerTotalScore(game.players[i].cards);
     renderCard(i, game.players[i].cards);
+    renderPlayerScore(game);
   }
   game.dealer.cards = await getCardFromApi(game, 2);
   renderCard("dealer", game.dealer.cards);
+  game.lastPlayerIndex = 0;
   return game;
 };
 
@@ -82,15 +94,12 @@ const drawCard = async game => {
 };
 
 const getCardFromApi = (game, numOfCards) => {
-  console.log("drawCard", game, numOfCards);
+  // console.log("drawCard", game, numOfCards);
   return fetch(
     `https://deckofcardsapi.com/api/deck/${game.deck.deck_id}/draw/?count=${numOfCards}`
   )
     .then(res => res.json())
-    .then(body => {
-      console.log(body);
-      return body.cards;
-    });
+    .then(body => body.cards);
 };
 
 const checkCardSumTotal = (game, lastPlayerIndex) => {};
@@ -108,23 +117,58 @@ const renderCard = (id, cards) => {
   });
 };
 
-console.log("gameObject", gameObject);
+// console.log("gameObject", gameObject);
 let bjGame = startGame(gameObject);
-console.log("gameObject", gameObject);
+// console.log("gameObject", gameObject);
+
+const renderPlayerScore = game => {
+  const playerScoreDiv = document.getElementById(
+    `player-${game.lastPlayerIndex}-score`
+  );
+
+  // console.log(playerScoreDiv);
+  playerScoreDiv.innerHTML = game.players[game.lastPlayerIndex].isBusted
+    ? "Busted"
+    : game.players[game.lastPlayerIndex].score;
+
+  return game;
+};
 
 const drawCardBtn = document.getElementById("drawCard");
 drawCardBtn.addEventListener("click", () => {
-  console.log("bjGame", bjGame);
+  // console.log("bjGame", bjGame);
 
-  bjGame = bjGame.then(game => drawCard(game));
+  bjGame = bjGame
+    .then(game => drawCard(game))
+    .then(game => updateTotalScore(game))
+    .then(game => isBusted(game))
+    .then(game => renderPlayerScore(game))
+    .then(game => finishTurnIfBusted(game));
+  // .then(game => );
 });
+
+const finishTurnIfBusted = game => {
+  if (game.players[game.lastPlayerIndex].isBusted) {
+    finishTurn(game);
+  }
+  return game;
+};
+
+const finishTurn = game => {
+  game.lastPlayerIndex++;
+  return game;
+};
 
 const endTurnBtn = document.getElementById("endTurn");
 endTurnBtn.addEventListener("click", () => {
   console.log("bjGame", bjGame);
 
-  bjGame = bjGame.then(game => {
-    game.lastPlayerIndex++;
-    return game;
-  });
+  bjGame = bjGame.then(game => finishTurn(game));
 });
+
+const isBusted = game => {
+  if (game.players[game.lastPlayerIndex].score > 21) {
+    game.players[game.lastPlayerIndex].isBusted = true;
+  }
+  return game;
+};
