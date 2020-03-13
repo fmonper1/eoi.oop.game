@@ -1,4 +1,5 @@
 const fetch = require("../../../node_modules/node-fetch");
+
 let gameObject = {
   players: [],
   lastPlayerIndex: 0,
@@ -27,24 +28,20 @@ const setupPlayers = game => {
   return new Promise((resolve, reject) => {
     console.log("setup players", game);
 
-    game.players = new Array(game.numOfPlayers).fill({
+    game.players = new Array(game.numOfPlayers).fill().map(() => ({
       cards: [],
       score: 0,
       isBusted: false
-    });
+    }));
     resolve(game);
   });
 };
 
 const drawFirstRound = async game => {
   for (let i = 0; i < game.numOfPlayers; i++) {
-    console.log("drawFirstRound", i, game.players[i]);
     game.players[i].cards = await drawCard(game, 2);
-    console.log("drawFirstRound", i, game.players[i]);
   }
-  // game.players.map((player, index) =>
-  //   drawCard(game, 2).then(result => (player.cards = result.cards))
-  // );
+  return game;
 };
 
 const drawCard = (game, numOfCards) => {
