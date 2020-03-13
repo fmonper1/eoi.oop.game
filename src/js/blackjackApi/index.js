@@ -1,4 +1,4 @@
-import { drawCardButton, endTurnButton } from "./htmlEventListeners";
+import { drawCardButton, endTurnButton } from "./userInteractions";
 import { startGame } from "./blackjack";
 
 let gameObject = {

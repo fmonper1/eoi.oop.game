@@ -1,11 +1,12 @@
 import {
   drawCard,
-  updateTotalScore,
   isBusted,
   renderPlayerScore,
   finishTurnIfBusted,
   finishTurn
 } from "./blackjack";
+
+import { updateTotalScore } from "./utils";
 
 export const endTurnButton = game => {
   const endTurnBtn = document.getElementById("endTurn");
@@ -38,11 +39,11 @@ export const drawCardLogic = game => {
     .then(game => finishTurnIfBusted(game));
 };
 
-const dealerFinalHand = game => {
-  if (game.lastPlayerIndex === game.numOfPlayers) {
-    while (game.players[game.numOfPlayers].score < 16) {
-      return drawCardLogic(game);
-    }
-  }
-  return game;
-};
+// const dealerFinalHand = game => {
+//   if (game.lastPlayerIndex === game.numOfPlayers) {
+//     while (game.players[game.numOfPlayers].score < 16) {
+//       return drawCardLogic(game);
+//     }
+//   }
+//   return game;
+// };

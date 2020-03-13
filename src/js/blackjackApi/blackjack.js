@@ -1,14 +1,10 @@
 import fetch from "node-fetch";
-
+import {
+  calculatePlayerTotalScore,
+  updateTotalScore,
+  convertCardValueToInt
+} from "./utils";
 // TODO: Se hacen muchas llamadas a la api: deberia hacer una y guardarlas en un array
-
-// let gameObject = {
-//   players: [],
-//   lastPlayerIndex: 0,
-//   deck: {},
-//   numOfPlayers: 4,
-//   isFinished: false
-// };
 
 export const startGame = game => {
   return fetch("https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=6")
@@ -35,19 +31,6 @@ const setupPlayers = game => {
   return game;
 };
 
-const calculatePlayerTotalScore = cardsArray => {
-  return cardsArray
-    .map(card => card.value)
-    .reduce((a, b = 0) => convertCardValueToInt(a) + convertCardValueToInt(b));
-};
-
-export const updateTotalScore = game => {
-  let currentPlayer = game.players[game.lastPlayerIndex];
-
-  currentPlayer.score = calculatePlayerTotalScore(currentPlayer.cards);
-  return game;
-};
-
 // I add one so that in the last iteration
 // we can give the dealer its cards
 const drawFirstRound = async game => {
@@ -69,17 +52,6 @@ const drawFirstRound = async game => {
 
   game.lastPlayerIndex = 0;
   return game;
-};
-
-export const convertCardValueToInt = value => {
-  // console.log("value", value, typeof value);
-  if (value === "JACK" || value === "QUEEN" || value === "KING") {
-    return 10;
-  } else if (value === "ACE") {
-    return 11;
-  } else {
-    return parseInt(value);
-  }
 };
 
 export const drawCard = async game => {
@@ -158,7 +130,3 @@ export const isBusted = game => {
   }
   return game;
 };
-
-// let bjGame = startGame(gameObject);
-// drawCardButton(bjGame);
-// endTurnButton(bjGame);
