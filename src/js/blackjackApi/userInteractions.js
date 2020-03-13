@@ -1,12 +1,4 @@
-import {
-  drawCard,
-  isBusted,
-  renderPlayerScore,
-  finishTurnIfBusted,
-  finishTurn
-} from "./blackjack";
-
-import { updateTotalScore } from "./utils";
+import { drawCardLogic, finishTurn } from "./blackjack";
 
 export const endTurnButton = game => {
   const endTurnBtn = document.getElementById("endTurn");
@@ -26,17 +18,6 @@ export const drawCardButton = game => {
     // .then(game => );
     return drawCardLogic(game);
   });
-};
-
-export const drawCardLogic = game => {
-  console.log("drawCardLogic() game is equal to", game, typeof game);
-
-  return game
-    .then(game => drawCard(game))
-    .then(game => updateTotalScore(game))
-    .then(game => isBusted(game))
-    .then(game => renderPlayerScore(game))
-    .then(game => finishTurnIfBusted(game));
 };
 
 // const dealerFinalHand = game => {

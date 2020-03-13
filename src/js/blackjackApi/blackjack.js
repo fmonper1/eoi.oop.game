@@ -130,3 +130,14 @@ export const isBusted = game => {
   }
   return game;
 };
+
+export const drawCardLogic = game => {
+  console.log("drawCardLogic() game is equal to", game, typeof game);
+
+  return game
+    .then(game => drawCard(game))
+    .then(game => updateTotalScore(game))
+    .then(game => isBusted(game))
+    .then(game => renderPlayerScore(game))
+    .then(game => finishTurnIfBusted(game));
+};
