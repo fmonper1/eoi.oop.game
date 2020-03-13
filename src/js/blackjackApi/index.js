@@ -33,6 +33,7 @@ const setupPlayers = game => {
       isDealer: false
     }));
     game.players[game.numOfPlayers].isDealer = true;
+    console.log("SetupPlayers() game is equals to", game);
     resolve(game);
   });
 };
@@ -46,10 +47,7 @@ const calculatePlayerTotalScore = cardsArray => {
 };
 
 const updateTotalScore = game => {
-  let currentPlayer =
-    game.lastPlayerIndex === game.numOfPlayers
-      ? game.dealer
-      : game.players[game.lastPlayerIndex];
+  let currentPlayer = game.players[game.lastPlayerIndex];
 
   currentPlayer.score = calculatePlayerTotalScore(currentPlayer.cards);
   return game;
@@ -58,20 +56,26 @@ const updateTotalScore = game => {
 // I add one so that in the last iteration
 // we can give the dealer its cards
 const drawFirstRound = async game => {
-  for (let i = 0; i < game.numOfPlayers; i++) {
+  for (let i = 0; i < game.numOfPlayers + 1; i++) {
     game.lastPlayerIndex = i;
     let cardsFromApi = await getCardFromApi(game, 2);
     game.players[i].cards = cardsFromApi;
     game.players[i].score = calculatePlayerTotalScore(game.players[i].cards);
-    renderCard(i, game.players[i].cards);
+
+    let isDealer =
+      game.lastPlayerIndex === game.numOfPlayers
+        ? "dealer"
+        : game.lastPlayerIndex;
+
+    renderCard(isDealer, game.players[i].cards);
     renderPlayerScore(game);
   }
-  game.lastPlayerIndex++;
-  game.dealer.cards = await getCardFromApi(game, 2);
-  game.dealer.score = calculatePlayerTotalScore(game.dealer.cards);
+  // game.lastPlayerIndex++;
+  // game.dealer.cards = await getCardFromApi(game, 2);
+  // game.dealer.score = calculatePlayerTotalScore(game.dealer.cards);
 
-  renderCard("dealer", game.dealer.cards);
-  renderPlayerScore(game);
+  // renderCard("dealer", game.dealer.cards);
+  // renderPlayerScore(game);
   game.lastPlayerIndex = 0;
   return game;
 };
@@ -88,18 +92,11 @@ const convertCardValueToInt = value => {
 };
 
 const drawCard = async game => {
-  if (game.lastPlayerIndex < game.numOfPlayers) {
-    let i = game.lastPlayerIndex;
-    const newCard = await getCardFromApi(game, 1);
-    game.players[i].cards = game.players[i].cards.concat(newCard);
-    renderCard(i, newCard);
-    return game;
-  } else {
-    const newCard = await getCardFromApi(game, 1);
-    game.dealer.cards = game.dealer.cards.concat(newCard);
-    renderCard("dealer", newCard);
-    return game;
-  }
+  let i = game.lastPlayerIndex;
+  const newCard = await getCardFromApi(game, 1);
+  game.players[i].cards = game.players[i].cards.concat(newCard);
+  renderCard(i, newCard);
+  return game;
 };
 
 const getCardFromApi = (game, numOfCards) => {
@@ -135,14 +132,12 @@ const renderPlayerScore = game => {
     game.lastPlayerIndex === game.numOfPlayers
       ? "dealer"
       : game.lastPlayerIndex;
+
   const playerScoreDiv = document.getElementById(
     `player-${playerIdentifier}-score`
   );
 
-  let currentPlayer =
-    playerIdentifier === "dealer"
-      ? game.dealer
-      : game.players[game.lastPlayerIndex];
+  let currentPlayer = game.players[game.lastPlayerIndex];
   // console.log(playerScoreDiv);
 
   playerScoreDiv.innerHTML = currentPlayer.isBusted
