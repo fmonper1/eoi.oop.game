@@ -7,21 +7,30 @@
     "node-fetch": "^2.6.0"
   },
   "devDependencies": {
-    "parcel": "^1.12.4",
     "@babel/core": "7.2.0",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/plugin-transform-modules-commonjs": "^7.8.3",
     "@babel/plugin-transform-runtime": "^7.8.3",
     "@types/jest": "^25.1.4",
+    "@typescript-eslint/eslint-plugin": "^2.23.0",
+    "@typescript-eslint/parser": "^2.23.0",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-runtime": "^6.26.0",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-jest": "^23.8.2",
     "jest": "^25.1.0",
-    "sass": "^1.26.3"
+    "parcel": "^1.12.4",
+    "prettier": "^1.19.1",
+    "sass": "^1.26.3",
+    "typescript": "^3.8.3"
   },
   "scripts": {
     "dev": "parcel src/index.html",
     "test": "jest",
-    "test-watch": "jest --watch"
+    "test-watch": "jest --watch",
+    "lint": "eslint --max-warnings 0 . --ext .ts,.js"
   },
   "repository": {
     "type": "git",
