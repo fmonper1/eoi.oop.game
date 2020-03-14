@@ -11,8 +11,23 @@ body {
 
   display: flex;
   flex-direction: column;
+  height: 100vh;
+  overflow-x: hidden;
 }
 
+#btnGroup {
+  text-align: center;
+  h1#page-title {
+    font-family: "Bree Serif", serif;
+    text-shadow: 1px 1px 0 #f7f7f7;
+  }
+  .btn {
+    background: white;
+    border: 2px solid red;
+    border-radius: 5px;
+    padding: 10px 15px;
+  }
+}
 .card-img {
   max-width: 50px;
   border: 1px solid red;
@@ -24,9 +39,11 @@ body {
 @keyframes resize {
   from {
     width: 0;
+    height: 0;
   }
   to {
     width: 50px;
+    height: 69px;
   }
 }
 
@@ -34,7 +51,7 @@ body {
   display: flex;
   flex-direction: column;
   max-width: 960px;
-  margin: 0 auto;
+  margin: 30px auto;
   border-radius: 35%;
   padding: 0 50px;
 
@@ -84,7 +101,7 @@ body {
   .playerHand {
     display: flex;
     flex-direction: column-reverse;
-
+    justify-content: center;
     width: 160px;
     height: 250px;
   }

@@ -6,18 +6,6 @@ import {
 } from "./utils";
 // TODO: Se hacen muchas llamadas a la api: deberia hacer una y guardarlas en un array
 
-export const startGame = game => {
-  return fetch("https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=6")
-    .then(res => res.json())
-    .then(body => {
-      game.deck = body;
-      return game;
-    })
-    .then(game => setupPlayers(game))
-    .then(game => drawFirstRound(game))
-    .then(game => game);
-};
-
 export const setupDeckData = game => {
   return fetch("https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=6")
     .then(res => res.json())
@@ -50,12 +38,9 @@ export const drawFirstRound = async game => {
     game.players[i].cards = cardsFromApi;
     game.players[i].score = calculatePlayerTotalScore(game.players[i].cards);
 
-    let isDealer =
-      game.lastPlayerIndex === game.numOfPlayers
-        ? "dealer"
-        : game.lastPlayerIndex;
+    let isDealer = game.players[i].isDealer ? "dealer" : game.lastPlayerIndex;
 
-    renderCardInWebsite(isDealer, game.players[i].cards);
+    renderCards(isDealer, game.players[i].cards);
     renderPlayerScore(game);
   }
 
@@ -67,11 +52,9 @@ export const drawCard = async game => {
   let i = game.lastPlayerIndex;
   const newCard = await getCardFromApi(game, 1);
   game.players[i].cards = game.players[i].cards.concat(newCard);
-  let isDealer =
-    game.lastPlayerIndex === game.numOfPlayers
-      ? "dealer"
-      : game.lastPlayerIndex;
-  renderCardInWebsite(isDealer, newCard);
+  let isDealer = game.players[i].isDealer ? "dealer" : game.lastPlayerIndex;
+
+  renderCards(isDealer, newCard);
   return game;
 };
 
@@ -84,7 +67,7 @@ const getCardFromApi = (game, numOfCards) => {
     .then(body => body.cards);
 };
 
-export const renderCardInWebsite = (id, cards) => {
+export const renderCards = (id, cards) => {
   const playerCards = document.getElementById(`player-${id}-cards`);
 
   cards.forEach(async card => {
@@ -99,10 +82,9 @@ export const renderCardInWebsite = (id, cards) => {
 
 export const renderPlayerScore = game => {
   // si el indice es el ultimo hay que devolver dealer para encontrar el div por ID
-  let playerIdentifier =
-    game.lastPlayerIndex === game.numOfPlayers
-      ? "dealer"
-      : game.lastPlayerIndex;
+  let playerIdentifier = game.players[game.lastPlayerIndex].isDealer
+    ? "dealer"
+    : game.lastPlayerIndex;
 
   const playerScoreDiv = document.getElementById(
     `player-${playerIdentifier}-score`

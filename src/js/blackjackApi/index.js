@@ -1,18 +1,15 @@
 import { drawCardButton, endTurnButton } from "./userInteractions";
-import {
-  startGame,
-  setupDeckData,
-  setupPlayers,
-  drawFirstRound
-} from "./blackjack";
+import { setupDeckData, setupPlayers, drawFirstRound } from "./blackjack";
 
-let gameObject = {
+const createGameObject = () => ({
   players: [],
   lastPlayerIndex: 0,
   deck: {},
   numOfPlayers: 4,
   isFinished: false
-};
+});
+
+let gameObject = createGameObject();
 
 // let bjGame = startGame(gameObject);
 const initGame = async () => {
