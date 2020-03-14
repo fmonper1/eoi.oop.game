@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 
-import { calculatePlayerTotalScore, updateTotalScore, convertCardValueToInt } from './utils';
+import { calculatePlayerTotalScore, updateTotalScore, convertCardValueToInt } from '../utils';
 
 // TODO: Se hacen muchas llamadas a la api: deberia hacer una y guardarlas en un array
 

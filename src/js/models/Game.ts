@@ -69,19 +69,23 @@ export class Game {
   }
 
   finishTurn() {
-    this.lastPlayerIndex++;
+    this.isFinished ? '' : this.lastPlayerIndex++;
     console.log('game cuando es el turno del player', this.lastPlayerIndex, this);
 
     if (this.lastPlayerIndex === this.numOfPlayers) {
       console.log('game cuando es el turno del dealer', this);
       this.dealerFinalHand();
+      this.isFinished = true;
     }
   }
 
-  dealerFinalHand() {
+  async dealerFinalHand() {
+    console.log('executing dealerFinalHand()');
     if (this.lastPlayerIndex === this.numOfPlayers) {
-      while (this.players[this.numOfPlayers].score < 16) {
-        this.drawCardLogic();
+      while (this.players[this.numOfPlayers].score < 17) {
+        console.log(this.players[this.numOfPlayers].score);
+
+        await this.drawCardLogic();
       }
     }
   }
