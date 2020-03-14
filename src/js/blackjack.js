@@ -1,15 +1,11 @@
-import fetch from "node-fetch";
+import fetch from 'node-fetch';
 
-import {
-  calculatePlayerTotalScore,
-  updateTotalScore,
-  convertCardValueToInt
-} from "./utils";
+import { calculatePlayerTotalScore, updateTotalScore, convertCardValueToInt } from './utils';
 
 // TODO: Se hacen muchas llamadas a la api: deberia hacer una y guardarlas en un array
 
 export const setupDeckData = game => {
-  return fetch("https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=6")
+  return fetch('https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=6')
     .then(res => res.json())
     .then(body => {
       game.deck = body;
@@ -26,7 +22,7 @@ export const setupPlayers = game => {
   }));
   game.players[game.numOfPlayers].isDealer = true;
 
-  console.log("SetupPlayers() game is equals to", game);
+  console.log('SetupPlayers() game is equals to', game);
   return game;
 };
 
@@ -34,13 +30,13 @@ export const setupPlayers = game => {
 // we can give the dealer its cards
 export const drawFirstRound = async game => {
   for (let i = 0; i < game.numOfPlayers + 1; i++) {
-    let cardsFromApi = await getCardFromApi(game, 2);
+    const cardsFromApi = await getCardFromApi(game, 2);
 
     game.lastPlayerIndex = i;
     game.players[i].cards = cardsFromApi;
     game.players[i].score = calculatePlayerTotalScore(game.players[i].cards);
 
-    let isDealer = game.players[i].isDealer ? "dealer" : game.lastPlayerIndex;
+    const isDealer = game.players[i].isDealer ? 'dealer' : game.lastPlayerIndex;
 
     renderCards(isDealer, game.players[i].cards);
     renderPlayerScore(game);
@@ -51,10 +47,10 @@ export const drawFirstRound = async game => {
 };
 
 export const drawCard = async game => {
-  let i = game.lastPlayerIndex;
+  const i = game.lastPlayerIndex;
   const newCard = await getCardFromApi(game, 1);
   game.players[i].cards = game.players[i].cards.concat(newCard);
-  let isDealer = game.players[i].isDealer ? "dealer" : game.lastPlayerIndex;
+  const isDealer = game.players[i].isDealer ? 'dealer' : game.lastPlayerIndex;
 
   renderCards(isDealer, newCard);
   return game;
@@ -62,9 +58,7 @@ export const drawCard = async game => {
 
 const getCardFromApi = (game, numOfCards) => {
   // console.log("drawCard", game, numOfCards);
-  return fetch(
-    `https://deckofcardsapi.com/api/deck/${game.deck.deck_id}/draw/?count=${numOfCards}`
-  )
+  return fetch(`https://deckofcardsapi.com/api/deck/${game.deck.deck_id}/draw/?count=${numOfCards}`)
     .then(res => res.json())
     .then(body => body.cards);
 };
@@ -73,28 +67,22 @@ export const renderCards = (id, cards) => {
   const playerCards = document.getElementById(`player-${id}-cards`);
 
   cards.forEach(async card => {
-    let img = document.createElement("img");
+    const img = document.createElement('img');
     img.src = card.images.png;
-    img.classList = "card-img";
-    img.display = "block";
+    img.classList = 'card-img';
+    img.display = 'block';
 
-    await playerCards.appendChild(img); //si no la hago asyn aveces alguna carta no se renderiza ??
+    await playerCards.appendChild(img); // si no la hago asyn aveces alguna carta no se renderiza ??
   });
 };
 
 export const renderPlayerScore = game => {
   // si el indice es el ultimo hay que devolver dealer para encontrar el div por ID
-  let playerIdentifier = game.players[game.lastPlayerIndex].isDealer
-    ? "dealer"
-    : game.lastPlayerIndex;
+  const playerIdentifier = game.players[game.lastPlayerIndex].isDealer ? 'dealer' : game.lastPlayerIndex;
 
-  const playerScoreDiv = document.getElementById(
-    `player-${playerIdentifier}-score`
-  );
+  const playerScoreDiv = document.getElementById(`player-${playerIdentifier}-score`);
 
-  playerScoreDiv.innerHTML = game.players[game.lastPlayerIndex].isBusted
-    ? "Busted"
-    : game.players[game.lastPlayerIndex].score;
+  playerScoreDiv.innerHTML = game.players[game.lastPlayerIndex].isBusted ? 'Busted' : game.players[game.lastPlayerIndex].score;
 
   return game;
 };
@@ -108,10 +96,10 @@ export const finishTurnIfBusted = game => {
 
 export const finishTurn = game => {
   game.lastPlayerIndex++;
-  console.log("game cuando es el turno del player", game.lastPlayerIndex, game);
+  console.log('game cuando es el turno del player', game.lastPlayerIndex, game);
 
   if (game.lastPlayerIndex === game.numOfPlayers) {
-    console.log("game cuando es el turno del dealer", game);
+    console.log('game cuando es el turno del dealer', game);
     game = dealerFinalHand(game);
   }
   return game;
@@ -134,7 +122,7 @@ export const isBusted = game => {
 };
 
 export const drawCardLogic = async game => {
-  console.log("drawCardLogic() game is equal to", game, typeof game);
+  console.log('drawCardLogic() game is equal to', game, typeof game);
 
   game = await drawCard(game);
   game = updateTotalScore(game);

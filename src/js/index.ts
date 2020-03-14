@@ -1,5 +1,4 @@
 import { drawCardButton, endTurnButton } from './userInteractions';
-import { setupDeckData, setupPlayers, drawFirstRound } from './blackjack';
 import { Game } from './models/Game';
 import { DeckAPIService } from './deck/DeckAPIService';
 
@@ -22,13 +21,8 @@ export const initGame = async () => {
 
   console.log('newgameobject', game);
 
-  let gameObject = createGameObject();
-  gameObject = await setupDeckData(gameObject);
-  gameObject = await setupPlayers(gameObject);
-  gameObject = await drawFirstRound(gameObject);
-
-  drawCardButton(gameObject);
-  endTurnButton(gameObject);
+  drawCardButton(game);
+  endTurnButton(game);
 };
 
 initGame();
