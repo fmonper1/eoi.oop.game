@@ -1,4 +1,4 @@
-import { initGame } from "../index";
+import { initGame } from '../index';
 
 describe('index', () => {
   describe('initGame', () => {

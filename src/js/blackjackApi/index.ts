@@ -11,8 +11,6 @@ const createGameObject = () => ({
   isFinished: false
 });
 
-let gameObject = createGameObject();
-
 // let bjGame = startGame(gameObject);
 export const initGame = async () => {
   const deckService = new DeckAPIService();
@@ -20,6 +18,7 @@ export const initGame = async () => {
   const game = new Game(4, deckService);
   await game.setupDeckData();
 
+  let gameObject = createGameObject();
   gameObject = await setupDeckData(gameObject);
   gameObject = await setupPlayers(gameObject);
   gameObject = await drawFirstRound(gameObject);
