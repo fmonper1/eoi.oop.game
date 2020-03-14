@@ -4,7 +4,7 @@
     "es6": true
   },
   "extends": [
-    "airbnb-base"
+    "semistandard"
   ],
   "globals": {
     "Atomics": "readonly",
@@ -19,5 +19,7 @@
     "@typescript-eslint"
   ],
   "rules": {
+    "space-before-function-paren": "off",
+    "padded-blocks": "off"
   }
 }
