@@ -12,7 +12,7 @@ const createGameObject = () => ({
 let gameObject = createGameObject();
 
 // let bjGame = startGame(gameObject);
-const initGame = async () => {
+export const initGame = async () => {
   gameObject = await setupDeckData(gameObject);
   gameObject = await setupPlayers(gameObject);
   gameObject = await drawFirstRound(gameObject);
