@@ -19,4 +19,10 @@ export class DeckAPIService implements DeckService {
       .then(toJSON)
       .then(toDeck);
   }
+
+  getCardFromApi(deckId: string, numOfCards: number): Promise<any[]> {
+    return request(`${DECK_ROOT_API}/deck/${deckId}/draw/?count=${numOfCards}`)
+      .then(toJSON)
+      .then(body => body.cards);
+  }
 }

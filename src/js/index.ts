@@ -17,6 +17,10 @@ export const initGame = async () => {
 
   const game = new Game(4, deckService);
   await game.setupDeckData();
+  game.setupPlayers();
+  await game.drawFirstRound();
+
+  console.log('newgameobject', game);
 
   let gameObject = createGameObject();
   gameObject = await setupDeckData(gameObject);
