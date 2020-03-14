@@ -13,12 +13,12 @@ let gameObject = createGameObject();
 
 // let bjGame = startGame(gameObject);
 const initGame = async () => {
-  let game = await setupDeckData(gameObject);
-  game = await setupPlayers(game);
-  game = await drawFirstRound(game);
+  gameObject = await setupDeckData(gameObject);
+  gameObject = await setupPlayers(gameObject);
+  gameObject = await drawFirstRound(gameObject);
 
-  drawCardButton(game);
-  endTurnButton(game);
+  drawCardButton(gameObject);
+  endTurnButton(gameObject);
 };
 
 initGame();
