@@ -69,13 +69,15 @@ export class Game {
   }
 
   finishTurn() {
-    this.isFinished ? '' : this.lastPlayerIndex++;
+    if (!this.isFinished) {
+      this.lastPlayerIndex++;
+    }
+
     console.log('game cuando es el turno del player', this.lastPlayerIndex, this);
 
     if (this.lastPlayerIndex === this.numOfPlayers) {
       console.log('game cuando es el turno del dealer', this);
       this.dealerFinalHand();
-      this.isFinished = true;
     }
   }
 
@@ -88,6 +90,7 @@ export class Game {
         await this.drawCardLogic();
       }
     }
+    this.isFinished = true;
   }
 
   isBusted = () => {
@@ -101,6 +104,9 @@ export class Game {
   };
 
   async drawCardLogic() {
+    if (this.isFinished) {
+      return;
+    }
     console.log('drawCardLogic() game is equal to', this, typeof this);
 
     await this.drawCard();
