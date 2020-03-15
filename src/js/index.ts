@@ -6,9 +6,7 @@ export const initGame = async () => {
   const deckService = new DeckAPIService();
 
   const game = new Game(4, deckService);
-  await game.setupDeckData();
-  game.setupPlayers();
-  await game.drawFirstRound();
+  await game.initGame();
 
   console.log('newgameobject', game);
 

@@ -25,9 +25,15 @@ export class Game {
     this.winners = [];
   }
 
-  async setupDeckData() {
+  initGame = async () => {
+    await this.setupDeckData();
+    this.setupPlayers();
+    await this.drawFirstRound();
+  };
+
+  setupDeckData = async () => {
     this.deck = await this.deckService.generateNewDeck();
-  }
+  };
 
   // hacemos numOfPlayers + 1 para añadir el dealer al final del arra
   // entonces players[this.numOfPlayers] accede al ultimo elemento que es el Dealer
@@ -35,14 +41,9 @@ export class Game {
     for (let i = 0; i < this.numOfPlayers + 1; i++) {
       this.players.push(new Player());
     }
-    // this.players = new Array(this.numOfPlayers + 1).fill('').map(() => this.createPlayer);
     this.players[this.numOfPlayers].isDealer = true;
     this.players[this.numOfPlayers].name = 'JohnDealer';
-
-    console.log('setupPlayers', this);
   }
-
-  // createPlayer = () => new Player();
 
   async drawFirstRound() {
     console.log('drawFirstRound', this);
@@ -114,18 +115,19 @@ export class Game {
   checkWinners = () => {
     if (this.lastPlayerIndex >= this.numOfPlayers && !this.isFinished) {
       console.log('checkingForWinners...');
-      const dealer = this.players[this.numOfPlayers]; // No es total?? Esto es un any[]
+      const dealer = this.players[this.numOfPlayers];
 
       for (let i = 0; i < this.numOfPlayers; i++) {
-        if (this.players[i].score > dealer.score && !dealer.isBusted && !this.players[i].isBusted) {
-          console.log('winner', this.players[i]);
-          this.winners.push(this.players[i]);
-        } else if (!this.players[i].isBusted && dealer.isBusted) {
-          this.winners.push(this.players[i]);
+        const player = this.players[i];
+        if (player.score > dealer.score && !dealer.isBusted && !player.isBusted) {
+          console.log('winner', player);
+          this.winners.push(player);
+        } else if (!player.isBusted && dealer.isBusted) {
+          this.winners.push(player);
         }
       }
       if (this.winners.length === 0) {
-        this.winners.push(this.players[this.numOfPlayers]);
+        this.winners.push(dealer);
       }
       console.log('Ganadores', this.winners);
       this.renderWinners();
@@ -170,14 +172,7 @@ export class Game {
   };
 
   private renderWinners = () => {
-    // const chatDiv = document.getElementById('chat');
-
     this.winners.forEach(winner => {
-      // const div = document.createElement('div');
-      // div.classList = 'chat-log winner-log';
-      // div.innerHTML = `Player ${winner.name} won with a score of ${winner.score}`;
-
-      // chatDiv.appendChild(div);
       this.renderInChat(`<i class="fas fa-trophy"></i> ${winner.name} won with a score of ${winner.score}`, 'chat-winner');
     });
   };
