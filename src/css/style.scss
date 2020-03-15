@@ -1,12 +1,7 @@
-@import url("https://fonts.googleapis.com/css?family=Bree+Serif&display=swap");
+@import url('https://fonts.googleapis.com/css?family=Bree+Serif&display=swap');
 
 body {
-  background: radial-gradient(
-      ellipse at center,
-      rgba(135, 190, 70, 0.8) 60%,
-      rgba(102, 141, 55, 0.6) 100%
-    ),
-    url(../assets/bg-seamless.jpg) repeat center;
+  background: linear-gradient(rgba(138, 190, 72, 0.9) 60%, rgba(138, 190, 72, 0.9) 100%), url(../assets/bg-seamless.jpg) repeat center;
   background-size: 100%, 200px 200px;
   /* Add the blur effect */
 
@@ -14,12 +9,42 @@ body {
   flex-direction: column;
   height: 100vh;
   overflow-x: hidden;
+
+  padding: 0;
+  margin: 0;
+}
+
+#main {
+  display: flex;
+  flex-direction: row;
+}
+#game {
+  flex-grow: 1;
+}
+#sidebar {
+  width: 300px;
+  background: #e2e2e2;
+  padding: 50px;
+  h2 {
+    margin: 15px;
+    font-family: 'Bree Serif', serif;
+  }
+  #chat {
+    border-bottom: 1px solid #bbbbbb;
+    border-top: 1px solid #fff;
+    .chat-log {
+      font-family: 'Bree Serif', serif;
+      padding: 10px 0;
+      border-top: 1px solid #bbbbbb;
+      border-bottom: 1px solid #fff;
+    }
+  }
 }
 
 #btnGroup {
   text-align: center;
   h1#page-title {
-    font-family: "Bree Serif", serif;
+    font-family: 'Bree Serif', serif;
     text-shadow: 1px 1px 0 #f7f7f7;
   }
   .btn {
@@ -56,23 +81,17 @@ body {
   border-radius: 35%;
   padding: 0 50px;
 
-  background: radial-gradient(
-      ellipse at center,
-      rgba(255, 255, 255, 0.6) 0%,
-      rgba(255, 255, 255, 0) 100%
-    ),
-    url("../assets/green-bg.jpg") center;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 100%), url('../assets/green-bg.jpg') center;
   background-size: 100% 100%, 200px 200px;
 
-  box-shadow: inset 0 1px 0 5px #00000042, 0 0 0 6px #ffffff29,
-    0 0 0 12px #5f1611;
+  box-shadow: inset 0 1px 0 5px #00000042, 0 0 0 6px #ffffff29, 0 0 0 12px #5f1611;
 }
 
 .playerHand {
   text-align: center;
   h2 {
     margin: 15px;
-    font-family: "Bree Serif", serif;
+    font-family: 'Bree Serif', serif;
     .score {
       font-size: 16px !important;
     }

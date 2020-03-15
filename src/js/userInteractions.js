@@ -10,8 +10,8 @@ export const endTurnButton = game => {
 
 export const drawCardButton = game => {
   const drawCardBtn = document.getElementById('drawCard');
-  drawCardBtn.addEventListener('click', () => {
-    game.drawCardLogic();
+  drawCardBtn.addEventListener('click', async () => {
+    await game.drawCardFromUI();
   });
 };
 
