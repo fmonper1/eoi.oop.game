@@ -63,6 +63,15 @@ export class Game {
     this.renderCards(isDealer, newCard);
   }
 
+  async finishTurnFromUI() {
+    if (!this.isFinished) {
+      this.finishTurn();
+
+      await this.canPlayDealerHand();
+      this.checkWinners();
+    }
+  }
+
   finishTurnIfBusted() {
     if (this.players[this.lastPlayerIndex].isBusted) {
       this.finishTurn();
@@ -73,24 +82,19 @@ export class Game {
     if (!this.isFinished) {
       this.lastPlayerIndex++;
       console.log('game cuando es el turno del player', this.lastPlayerIndex, this);
-
-      if (this.lastPlayerIndex === this.numOfPlayers) {
-        console.log('game cuando es el turno del dealer', this);
-        this.dealerFinalHand();
-      }
     }
   }
 
-  async dealerFinalHand() {
-    console.log('executing dealerFinalHand()');
+  async canPlayDealerHand() {
     if (this.lastPlayerIndex === this.numOfPlayers) {
+      console.log('executing dealerFinalHand()');
+
       while (this.players[this.numOfPlayers].score < 17) {
         console.log(this.players[this.numOfPlayers].score);
 
         await this.drawCardLogic();
       }
     }
-    this.isFinished = true;
   }
 
   isBusted = () => {
@@ -104,16 +108,37 @@ export class Game {
   };
 
   async drawCardLogic() {
-    if (this.isFinished) {
-      return;
-    }
     console.log('drawCardLogic() game is equal to', this, typeof this);
 
     await this.drawCard();
     this.updateTotalScore();
     this.isBusted();
     this.renderPlayerScore(); // WTF!
+    await this.canPlayDealerHand();
+    this.checkWinners();
     this.finishTurnIfBusted();
+  }
+
+  checkWinners() {
+    if (this.lastPlayerIndex === this.numOfPlayers && !this.isFinished) {
+      console.log('checkingForWinners...');
+      const dealer = this.players[this.numOfPlayers]; // No es total?? Esto es un any[]
+      const winners: Player[] = []; // MAGIA DE TYPESCRIPT ??
+      for (let i = 0; i < this.numOfPlayers; i++) {
+        if (this.players[i].score > dealer.score && !dealer.isBusted && !this.players[i].isBusted) {
+          console.log('winner', this.players[i]);
+          console.log('winner', this.players[i]);
+          winners.push(this.players[i]);
+          //  lo que hay que comprobar si gano el dealer o un player
+        }
+        if (!this.players[i].isBusted && dealer.isBusted) {
+          winners.push(this.players[i]);
+        }
+      }
+      console.log('Ganadores', winners); // ahora imprime un array vacioy sde supone que gano el dealer EKISDE
+      this.isFinished = true; // aqui se acaba la partida srry no discord
+      // pruebalo ahora ;)
+    }
   }
 
   renderCards = (id: string, cards: any[]) => {
@@ -122,9 +147,7 @@ export class Game {
     cards.forEach(async card => {
       const img = document.createElement('img');
       img.src = card.images.png;
-      // img.classList.add('card-img'); // Maybe?
       img.classList = 'card-img';
-      // img.display('block'); // Maybe one more time??
       img.display = 'block';
 
       playerCards.appendChild(img); // si no la hago asyn aveces alguna carta no se renderiza ??
