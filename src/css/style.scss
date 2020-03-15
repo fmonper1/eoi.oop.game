@@ -19,12 +19,65 @@ body {
   flex-direction: row;
   height: 100%;
 }
+
 #game {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   padding: 20px;
+
+  #btnGroup {
+    text-align: center;
+    h1#page-title {
+      font-family: 'Bree Serif', serif;
+      text-shadow: 1px 1px 0 #f7f7f7;
+    }
+    .btn {
+      background: white;
+      border: 2px solid red;
+      border-radius: 5px;
+      padding: 10px 15px;
+    }
+  }
+  #table {
+    display: flex;
+    flex-direction: column;
+    // max-width: 960px;
+    margin: 30px;
+    border-radius: 35%;
+    padding: 0 50px;
+
+    background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 100%), url('../assets/green-bg.jpg') center;
+    background-size: 100% 100%, 200px 200px;
+
+    box-shadow: inset 0 1px 0 5px #00000042, 0 0 0 6px #ffffff29, 0 0 0 12px #5f1611;
+    #top {
+      display: flex;
+      justify-content: space-around;
+
+      .playerHand {
+        width: auto;
+        height: 170px;
+      }
+    }
+
+    #bottom {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-evenly;
+      padding: 0 0 35px 0;
+
+      .playerHand {
+        display: flex;
+        flex-direction: column-reverse;
+        justify-content: center;
+        width: 25%;
+        height: 230px;
+      }
+    }
+  }
 }
+
 #sidebar {
   width: 300px;
   background: #e2e2e2;
@@ -33,9 +86,12 @@ body {
     margin: 15px;
     font-family: 'Bree Serif', serif;
   }
+
   #chat {
     border-bottom: 1px solid #bbbbbb;
     border-top: 1px solid #fff;
+    height: 300px;
+    overflow: auto;
     .chat-log {
       font-family: 'Bree Serif', serif;
       padding: 10px 0;
@@ -45,19 +101,6 @@ body {
   }
 }
 
-#btnGroup {
-  text-align: center;
-  h1#page-title {
-    font-family: 'Bree Serif', serif;
-    text-shadow: 1px 1px 0 #f7f7f7;
-  }
-  .btn {
-    background: white;
-    border: 2px solid red;
-    border-radius: 5px;
-    padding: 10px 15px;
-  }
-}
 .card-img {
   max-width: 50px;
   border: 1px solid red;
@@ -77,20 +120,6 @@ body {
   }
 }
 
-#table {
-  display: flex;
-  flex-direction: column;
-  // max-width: 960px;
-  margin: 30px;
-  border-radius: 35%;
-  padding: 0 50px;
-
-  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 100%), url('../assets/green-bg.jpg') center;
-  background-size: 100% 100%, 200px 200px;
-
-  box-shadow: inset 0 1px 0 5px #00000042, 0 0 0 6px #ffffff29, 0 0 0 12px #5f1611;
-}
-
 .playerHand {
   text-align: center;
   h2 {
@@ -104,29 +133,4 @@ body {
 
 #player-dealer {
   margin: 0;
-}
-
-#top {
-  display: flex;
-  justify-content: space-around;
-
-  .playerHand {
-    width: auto;
-    height: 170px;
-  }
-}
-
-#bottom {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-  padding: 0 0 35px 0;
-
-  .playerHand {
-    display: flex;
-    flex-direction: column-reverse;
-    justify-content: center;
-    width: 25%;
-    height: 230px;
-  }
 }

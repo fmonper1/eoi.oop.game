@@ -1,5 +1,5 @@
 import { DeckService } from '../deck/DeckService';
-import { calculatePlayerTotalScore } from '../utils';
+// import { calculatePlayerTotalScore } from '../utils';
 import { Player } from './Player';
 
 /*
@@ -32,20 +32,20 @@ export class Game {
   // hacemos numOfPlayers + 1 para añadir el dealer al final del arra
   // entonces players[this.numOfPlayers] accede al ultimo elemento que es el Dealer
   setupPlayers() {
-    this.players = new Array(this.numOfPlayers + 1).fill('').map(() => this.createPlayer());
+    for (let i = 0; i < this.numOfPlayers + 1; i++) {
+      this.players.push(new Player());
+    }
+    // this.players = new Array(this.numOfPlayers + 1).fill('').map(() => this.createPlayer);
     this.players[this.numOfPlayers].isDealer = true;
     this.players[this.numOfPlayers].name = 'JohnDealer';
+
+    console.log('setupPlayers', this);
   }
 
-  createPlayer = (): Player => ({
-    name: 'JohnDoe',
-    cards: [],
-    score: 0,
-    isBusted: false,
-    isDealer: false
-  });
+  // createPlayer = () => new Player();
 
   async drawFirstRound() {
+    console.log('drawFirstRound', this);
     for (let i = 0; i < this.numOfPlayers + 1; i++) {
       await this.drawCard(2);
       this.updateTotalScore();
@@ -55,31 +55,34 @@ export class Game {
     this.lastPlayerIndex = 0;
   }
 
-  async drawCard(numberOfCards = 1) {
-    const currentPlayer = this.players[this.lastPlayerIndex];
-    const newCard = await this.deckService.getCardFromApi(this.deck.deckId, numberOfCards);
-    currentPlayer.cards = currentPlayer.cards.concat(newCard);
+  drawCard = async (numberOfCards?: number) => {
+    numberOfCards = numberOfCards || 1;
+    const player = this.players[this.lastPlayerIndex];
+    const newCardOrCards = await this.deckService.getCardFromApi(this.deck.deckId, numberOfCards);
+    player.addCardToHand(newCardOrCards);
 
     // Render time
-    const isDealer = currentPlayer.isDealer ? 'dealer' : this.lastPlayerIndex.toString();
-    this.renderCards(isDealer, newCard);
-  }
+    this.renderCards(newCardOrCards);
+    newCardOrCards.forEach(card => {
+      this.renderInChat(`<i class="far fa-hand-paper"></i> ${player.name} draw a ${card.value} of ${card.suit}`, 'chat-draw-card');
+    });
+  };
 
-  async finishTurnIfBusted() {
+  finishTurnIfBusted = async () => {
     if (this.players[this.lastPlayerIndex].isBusted) {
       this.finishTurn();
       await this.canPlayDealerHand();
       this.checkWinners();
     }
-  }
+  };
 
-  finishTurn() {
+  private finishTurn = () => {
     if (!this.isFinished) {
       this.lastPlayerIndex++;
     }
-  }
+  };
 
-  async canPlayDealerHand() {
+  private canPlayDealerHand = async () => {
     if (this.lastPlayerIndex === this.numOfPlayers) {
       // console.log('executing dealerFinalHand()');
       while (this.players[this.numOfPlayers].score < 17) {
@@ -87,27 +90,28 @@ export class Game {
       }
       this.checkWinners();
     }
-  }
+  };
 
   private checkIfPlayerBusted = () => {
-    if (this.players[this.lastPlayerIndex].score > 21) {
-      this.players[this.lastPlayerIndex].isBusted = true;
+    const player = this.players[this.lastPlayerIndex];
+    if (player.checkIfBusted()) {
+      this.renderInChat(`<i class="fas fa-bomb"></i> ${player.name} busted! :(`, 'chat-busted');
     }
   };
 
   private updateTotalScore = () => {
-    this.players[this.lastPlayerIndex].score = calculatePlayerTotalScore(this.players[this.lastPlayerIndex].cards);
+    this.players[this.lastPlayerIndex].calculateTotalScore();
   };
 
-  async drawCardLogic() {
+  drawCardLogic = async () => {
     await this.drawCard();
     this.updateTotalScore();
     this.checkIfPlayerBusted();
     this.renderPlayerScore(); // we need to check if it has busted first!
     this.finishTurnIfBusted();
-  }
+  };
 
-  checkWinners() {
+  checkWinners = () => {
     if (this.lastPlayerIndex >= this.numOfPlayers && !this.isFinished) {
       console.log('checkingForWinners...');
       const dealer = this.players[this.numOfPlayers]; // No es total?? Esto es un any[]
@@ -127,10 +131,12 @@ export class Game {
       this.renderWinners();
       this.isFinished = true;
     }
-  }
+  };
 
   async finishTurnFromUI() {
     if (!this.isFinished) {
+      const player = this.players[this.lastPlayerIndex];
+      this.renderInChat(`<i class="fas fa-forward"></i> ${player.name} finished his turn.`, 'chat-finish-turn');
       this.finishTurn();
       await this.canPlayDealerHand();
       this.checkWinners();
@@ -141,14 +147,16 @@ export class Game {
     this.drawCardLogic();
   }
 
-  private renderCards = (id: string, cards: any[]) => {
+  private renderCards = (cards: any[]) => {
+    const id = this.players[this.lastPlayerIndex].isDealer ? 'dealer' : this.lastPlayerIndex.toString();
+
     const playerCards = document.getElementById(`player-${id}-cards`);
     cards.forEach(async card => {
       const img = document.createElement('img');
       img.src = card.images.png;
       img.classList = 'card-img';
       img.display = 'block';
-      playerCards.appendChild(img); // si no la hago asyn aveces alguna carta no se renderiza ??
+      await playerCards.appendChild(img); // si no la hago asyn aveces alguna carta no se renderiza ??
     });
   };
 
@@ -162,14 +170,26 @@ export class Game {
   };
 
   private renderWinners = () => {
-    const chatDiv = document.getElementById('chat');
+    // const chatDiv = document.getElementById('chat');
 
     this.winners.forEach(winner => {
-      const div = document.createElement('div');
-      div.classList = 'chat-log winner-log';
-      div.innerHTML = `Player ${winner.name} won with a score of ${winner.score}`;
+      // const div = document.createElement('div');
+      // div.classList = 'chat-log winner-log';
+      // div.innerHTML = `Player ${winner.name} won with a score of ${winner.score}`;
 
-      chatDiv.appendChild(div);
+      // chatDiv.appendChild(div);
+      this.renderInChat(`<i class="fas fa-trophy"></i> ${winner.name} won with a score of ${winner.score}`, 'chat-winner');
     });
+  };
+
+  private renderInChat = (msg: string, cssClass?: string) => {
+    console.log(msg);
+    const chatDiv = document.getElementById('chat');
+
+    const div = document.createElement('div');
+    div.classList = `chat-log ${cssClass}`;
+    div.innerHTML = msg;
+
+    chatDiv.insertBefore(div, chatDiv.firstChild);
   };
 }
