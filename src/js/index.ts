@@ -2,15 +2,6 @@ import { drawCardButton, endTurnButton } from './userInteractions';
 import { Game } from './models/Game';
 import { DeckAPIService } from './deck/DeckAPIService';
 
-const createGameObject = () => ({
-  players: [],
-  lastPlayerIndex: 0,
-  deck: {},
-  numOfPlayers: 4,
-  isFinished: false
-});
-
-// let bjGame = startGame(gameObject);
 export const initGame = async () => {
   const deckService = new DeckAPIService();
 

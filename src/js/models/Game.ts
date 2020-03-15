@@ -25,6 +25,7 @@ export class Game {
   // hacemos numOfPlayers + 1 para añadir el dealer al final del array
   setupPlayers() {
     this.players = new Array(this.numOfPlayers + 1).fill('').map(() => ({
+      name: 'JohnDoe',
       cards: [],
       score: 0,
       isBusted: false,
@@ -37,28 +38,23 @@ export class Game {
 
   async drawFirstRound() {
     for (let i = 0; i < this.numOfPlayers + 1; i++) {
-      const cardsFromApi = await this.deckService.getCardFromApi(this.deck.deckId, 2);
+      await this.drawCard(2);
 
-      this.lastPlayerIndex = i;
-      this.players[i].cards = cardsFromApi;
-      this.players[i].score = calculatePlayerTotalScore(this.players[i].cards);
-
-      // Render time
-      const isDealer = this.players[i].isDealer ? 'dealer' : this.lastPlayerIndex.toString();
-      this.renderCards(isDealer, this.players[i].cards);
+      this.updateTotalScore();
       this.renderPlayerScore();
+      this.lastPlayerIndex++;
     }
 
     this.lastPlayerIndex = 0;
   }
 
-  async drawCard() {
-    const i = this.lastPlayerIndex;
-    const newCard = await this.deckService.getCardFromApi(this.deck.deckId, 1);
-    this.players[i].cards = this.players[i].cards.concat(newCard);
+  async drawCard(numberOfCards = 1) {
+    const currentPlayer = this.players[this.lastPlayerIndex];
+    const newCard = await this.deckService.getCardFromApi(this.deck.deckId, numberOfCards);
+    currentPlayer.cards = currentPlayer.cards.concat(newCard);
 
     // Render time
-    const isDealer = this.players[i].isDealer ? 'dealer' : this.lastPlayerIndex.toString();
+    const isDealer = currentPlayer.isDealer ? 'dealer' : this.lastPlayerIndex.toString();
     this.renderCards(isDealer, newCard);
   }
 
@@ -71,13 +67,12 @@ export class Game {
   finishTurn() {
     if (!this.isFinished) {
       this.lastPlayerIndex++;
-    }
+      console.log('game cuando es el turno del player', this.lastPlayerIndex, this);
 
-    console.log('game cuando es el turno del player', this.lastPlayerIndex, this);
-
-    if (this.lastPlayerIndex === this.numOfPlayers) {
-      console.log('game cuando es el turno del dealer', this);
-      this.dealerFinalHand();
+      if (this.lastPlayerIndex === this.numOfPlayers) {
+        console.log('game cuando es el turno del dealer', this);
+        this.dealerFinalHand();
+      }
     }
   }
 
@@ -124,7 +119,7 @@ export class Game {
       img.src = card.images.png;
       // img.classList.add('card-img'); // Maybe?
       img.classList = 'card-img';
-      // img.display.add('card-img'); // Maybe one more time??
+      // img.display('block'); // Maybe one more time??
       img.display = 'block';
 
       playerCards.appendChild(img); // si no la hago asyn aveces alguna carta no se renderiza ??
