@@ -1,5 +1,6 @@
 import { DeckService } from '../deck/DeckService';
 import { calculatePlayerTotalScore } from '../utils';
+import { Player } from './Player';
 
 export class Game {
   private deckService: DeckService;
@@ -22,19 +23,23 @@ export class Game {
     this.deck = await this.deckService.generateNewDeck();
   }
 
-  // hacemos numOfPlayers + 1 para añadir el dealer al final del array
+  // hacemos numOfPlayers + 1 para añadir el dealer al final del arra
+  // entonces players[this.numOfPlayers] accede al ultimo elemento que es el Dealer
   setupPlayers() {
-    this.players = new Array(this.numOfPlayers + 1).fill('').map(() => ({
-      name: 'JohnDoe',
-      cards: [],
-      score: 0,
-      isBusted: false,
-      isDealer: false
-    }));
+    this.players = new Array(this.numOfPlayers + 1).fill('').map(() => this.createPlayer());
     this.players[this.numOfPlayers].isDealer = true;
+    this.players[this.numOfPlayers].name = 'JohnDealer';
 
     console.log('SetupPlayers() game is equals to', this);
   }
+
+  createPlayer = (): Player => ({
+    name: 'JohnDoe',
+    cards: [],
+    score: 0,
+    isBusted: false,
+    isDealer: false
+  });
 
   async drawFirstRound() {
     for (let i = 0; i < this.numOfPlayers + 1; i++) {
