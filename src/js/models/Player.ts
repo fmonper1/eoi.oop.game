@@ -1,11 +1,13 @@
 export class Player {
+  id: string;
   name: string;
   cards: any[];
   score: number;
   isBusted: boolean;
   isDealer: boolean;
 
-  constructor() {
+  constructor(id: string) {
+    this.id = id;
     this.name = 'JohnDoe';
     this.cards = [];
     this.score = 0;
