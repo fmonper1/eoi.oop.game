@@ -1,6 +1,7 @@
 import { DeckService } from '../deck/DeckService';
 // import { calculatePlayerTotalScore } from '../utils';
 import { Player } from './Player';
+import { Card } from './Card';
 
 /*
 Testing private methods
@@ -9,7 +10,7 @@ https://stackoverflow.com/questions/35987055/how-to-write-unit-testing-for-angul
 export class Game {
   private deckService: DeckService;
 
-  players: any[];
+  players: Player[];
   lastPlayerIndex: number;
   deck: any;
   numOfPlayers: number;
@@ -28,7 +29,7 @@ export class Game {
   initGame = async () => {
     await this.setupDeckData();
     this.setupPlayers();
-    await this.drawFirstRound();
+    await this.generateFirstRound();
   };
 
   setupDeckData = async () => {
@@ -39,34 +40,31 @@ export class Game {
   // entonces players[this.numOfPlayers] accede al ultimo elemento que es el Dealer
   setupPlayers() {
     for (let i = 0; i < this.numOfPlayers + 1; i++) {
-      this.players.push(new Player());
+      this.players.push(new Player(`${i}`));
     }
     this.players[this.numOfPlayers].isDealer = true;
     this.players[this.numOfPlayers].name = 'JohnDealer';
+    this.players[this.numOfPlayers].id = 'dealer';
   }
 
-  async drawFirstRound() {
+  async generateFirstRound() {
     console.log('drawFirstRound', this);
-    for (let i = 0; i < this.numOfPlayers + 1; i++) {
-      await this.drawCard(2);
-      this.updateTotalScore();
-      this.renderPlayerScore();
-      this.lastPlayerIndex++;
+    const newCard: Card[] = await this.deckService.getCardFromApi(this.deck.deckId, this.players.length * 2);
+    for (const player of this.players) {
+      player.addCardToHand(newCard.splice(0, 2));
+      player.calculateTotalScore();
+      // FIXME this.renderPlayerScore();
     }
-    this.lastPlayerIndex = 0;
   }
 
-  drawCard = async (numberOfCards?: number) => {
-    numberOfCards = numberOfCards || 1;
+  drawCard = async (numberOfCards = 1): Promise<Player> => {
     const player = this.players[this.lastPlayerIndex];
+
     const newCardOrCards = await this.deckService.getCardFromApi(this.deck.deckId, numberOfCards);
     player.addCardToHand(newCardOrCards);
     this.deck.remaining -= numberOfCards;
-    // Render time
-    this.renderCards(newCardOrCards);
-    newCardOrCards.forEach(card => {
-      this.renderInChat(`<i class="far fa-hand-paper"></i> ${player.name} draw a ${card.value} of ${card.suit}`, 'chat-draw-card');
-    });
+
+    return player;
   };
 
   finishTurnIfBusted = async () => {
@@ -103,7 +101,7 @@ export class Game {
   private updateTotalScore = () => {
     this.players[this.lastPlayerIndex].calculateTotalScore();
   };
-
+  
   drawCardLogic = async () => {
     await this.drawCard();
     this.updateTotalScore();
@@ -150,26 +148,14 @@ export class Game {
     this.drawCardLogic();
   }
 
-  private renderCards = (cards: any[]) => {
-    const id = this.players[this.lastPlayerIndex].isDealer ? 'dealer' : this.lastPlayerIndex.toString();
-
-    const playerCards = document.getElementById(`player-${id}-cards`);
-    cards.forEach(async card => {
-      const img = document.createElement('img');
-      img.src = card.images.png;
-      img.classList = 'card-img';
-      img.display = 'block';
-      await playerCards.appendChild(img); // si no la hago asyn aveces alguna carta no se renderiza ??
-    });
-  };
-
   private renderPlayerScore = () => {
     // si el indice es el ultimo hay que devolver dealer para encontrar el div por ID
     const playerIdentifier = this.players[this.lastPlayerIndex].isDealer ? 'dealer' : this.lastPlayerIndex;
 
     const playerScoreDiv = document.getElementById(`player-${playerIdentifier}-score`);
-
-    playerScoreDiv.innerHTML = this.players[this.lastPlayerIndex].isBusted ? 'Busted' : this.players[this.lastPlayerIndex].score;
+    if (playerScoreDiv) {
+      playerScoreDiv.innerHTML = this.players[this.lastPlayerIndex].isBusted ? 'Busted' : this.players[this.lastPlayerIndex].score;
+    }
   };
 
   private renderWinners = () => {
@@ -178,14 +164,7 @@ export class Game {
     });
   };
 
-  private renderInChat = (msg: string, cssClass?: string) => {
-    console.log(msg);
-    const chatDiv = document.getElementById('chat');
-
-    const div = document.createElement('div');
-    div.classList = `chat-log ${cssClass}`;
-    div.innerHTML = msg;
-
-    chatDiv.insertBefore(div, chatDiv.firstChild);
-  };
+  private renderInChat(s: string, chatFinishTurn: string) {
+    console.log('TODO', s, chatFinishTurn);
+  }
 }
