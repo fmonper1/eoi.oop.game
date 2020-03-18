@@ -61,7 +61,7 @@ export class Game {
     const player = this.players[this.lastPlayerIndex];
     const newCardOrCards = await this.deckService.getCardFromApi(this.deck.deckId, numberOfCards);
     player.addCardToHand(newCardOrCards);
-
+    this.deck.remaining -= numberOfCards;
     // Render time
     this.renderCards(newCardOrCards);
     newCardOrCards.forEach(card => {
@@ -139,6 +139,7 @@ export class Game {
     if (!this.isFinished) {
       const player = this.players[this.lastPlayerIndex];
       this.renderInChat(`<i class="fas fa-forward"></i> ${player.name} finished his turn.`, 'chat-finish-turn');
+
       this.finishTurn();
       await this.canPlayDealerHand();
       this.checkWinners();
