@@ -6,11 +6,19 @@ export interface UIManager {
 
   initialize();
 
+  addEventListeners();
+
+  initChat();
+
   onEndTurn();
 
   onDrawCard();
 
   onRestartGame();
+
+  disableActionButtons();
+
+  enableActionButtons();
 
   renderPlayers(players: Player[]);
 

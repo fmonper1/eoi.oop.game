@@ -17,9 +17,6 @@ const renderCard = (playerCards: HTMLElement) => (card: Card) => {
 //  TODO preguntar Raul si esta funcion no deberia ser un private de la class UIManagerVanilla
 
 const renderInChat = (msg: string, cssClass: string) => {
-  // const message = `<i class="far fa-hand-paper"></i> ${playerName} draw a ${card.value} of ${card.suit}`;
-
-  // const cssClass = 'chat-draw-card';
   const chatDiv = document.getElementById('chat');
   if (chatDiv) {
     const div: any = document.createElement('div');
@@ -41,9 +38,19 @@ export class UIManagerVanilla implements UIManager {
   }
 
   initialize() {
+    this.addEventListeners();
+    this.initChat();
+    this.enableActionButtons();
+  }
+
+  addEventListeners() {
     getElementById('endTurn')!.addEventListener('click', () => this.onEndTurn());
     getElementById('drawCard')!.addEventListener('click', () => this.onDrawCard());
     getElementById('restartGame')!.addEventListener('click', () => this.onRestartGame());
+  }
+
+  initChat() {
+    getElementById('chat')!.innerHTML = '';
   }
 
   async onDrawCard() {
@@ -76,18 +83,34 @@ export class UIManagerVanilla implements UIManager {
     if (player.isBusted) {
       renderInChat(`<i class="fas fa-bomb"></i> ${player.name} busted! :(`, 'chat-busted');
     }
-
-    // const message = `<i class="far fa-hand-paper"></i> ${playerName} draw a ${card.value} of ${card.suit}`;
   };
 
   private canPlayDealerHand = async () => {
     const dealer = await this.game.canPlayDealerHand();
 
     if (dealer) {
+      this.disableActionButtons();
       this.renderCards(dealer);
       this.renderPlayerScore(dealer);
     }
   };
+
+  enableActionButtons() {
+    getElementById('drawCard').disabled = false;
+    getElementById('endTurn').disabled = false;
+  }
+
+  disableActionButtons() {
+    const drawBtn = getElementById('drawCard');
+    const endTurnBtn = getElementById('endTurn');
+    if (drawBtn && endTurnBtn) {
+      drawBtn.disabled = true;
+      endTurnBtn.disabled = true;
+
+      // drawBtn.removeEventListener('click', this.onDrawCard()); // NO FUNCIONA Y NO SABEMOS PORQUE
+      // endTurnBtn.removeEventListener('click', this.onEndTurn()); // NO FUNCIONA Y NO SABEMOS PORQUE
+    }
+  }
 
   async onEndTurn() {
     const player = await this.game.finishTurn();
@@ -97,11 +120,27 @@ export class UIManagerVanilla implements UIManager {
     this.canCheckWinners();
   }
 
-  // TODO: ESTA ES PARA MILAN
-  onRestartGame() {
-    // cleanUp Chat
-    // cleanUp Cards
-    //
+  // TODO: ESTA ES PARA MILAN ESTO SOBRA YA
+
+  async onRestartGame() {
+    this.clearPlayerCards();
+    this.game.resetGameParams();
+    this.initialize();
+    this.initChat();
+
+    /*
+        esto no furula "bien", es recursivo
+      */
+    // await this.game.initGame(); // ESTA CREANDO UN BUCLE INFINITO ESTO
+  }
+
+  clearPlayerCards() {
+    for (let i = 0; i < this.game.players.length; i++) {
+      const player = this.game.players[i];
+      console.log(getElementById(`player-${player.id}-cards`));
+
+      getElementById(`player-${player.id}-cards`)!.innerHTML = '';
+    }
   }
 
   private renderCards = (owner: Player) => {
@@ -121,10 +160,10 @@ export class UIManagerVanilla implements UIManager {
     }
   };
 
-  private renderGameLog(newCardOrCards: any) {
-    const { name } = this.game.players[this.game.lastPlayerIndex];
-    newCardOrCards.forEach(renderInChat(name));
-  }
+  // private renderGameLog(newCardOrCards: any) {
+  //   const { name } = this.game.players[this.game.lastPlayerIndex];
+  //   newCardOrCards.forEach(renderInChat(name));
+  // }
 
   renderPlayers(players: Player[]) {
     players.forEach(player => this.renderCards(player));

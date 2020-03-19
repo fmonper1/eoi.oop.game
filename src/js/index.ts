@@ -12,7 +12,9 @@ export const initGame = async () => {
 
   const uiManager = new UIManagerVanilla(game);
 
+  await game.setupDeckData();
   await game.initGame();
+
   uiManager.renderPlayers(game.players);
   uiManager.renderScores(game.players);
 

@@ -29,8 +29,14 @@ export class Game {
     this.winners = [];
   }
 
+  resetGameParams = () => {
+    this.isFinished = false;
+    this.lastPlayerIndex = 0;
+    this.players = [];
+    this.winners = [];
+  };
+
   initGame = async () => {
-    await this.setupDeckData();
     this.setupPlayers();
     await this.generateFirstRound();
   };
