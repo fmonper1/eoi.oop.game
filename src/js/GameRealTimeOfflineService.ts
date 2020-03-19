@@ -2,16 +2,8 @@ import { GameRealTimeService } from './GameRealTimeService';
 import { Player } from './models/Player';
 
 export class GameLANOfflineService implements GameRealTimeService {
-
-  /next
-   2A
-  /next
-  /finish
-
-
-
   constructor() {
-    channel.on('new-player', (args) => this.newPlayer(args));
+    channel.on('new-player', args => this.newPlayer(args));
   }
 
   newPlayer(player: Player) {
@@ -19,21 +11,11 @@ export class GameLANOfflineService implements GameRealTimeService {
     this.game.player.add(player);
   }
 
-  JKon() {
-    setTimeout(() => {
-      console.log('EY! new user');
-    }, 4000);
-  }
+  initGame() {}
 
-  initGame() {
-  }
+  waitingFor() {}
 
-  waitingFor() {
-  }
+  join() {}
 
-  join() {
-  }
-
-
-  playerCard()
+  playerCard();
 }

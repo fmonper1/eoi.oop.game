@@ -14,14 +14,17 @@ const renderCard = (playerCards: HTMLElement) => (card: Card) => {
   card.isDirty = false;
 };
 
-const renderInChat = (playerName: string) => (card) => {
-  const message = `<i class="far fa-hand-paper"></i> ${playerName} draw a ${card.value} of ${card.suit}`;
-  const cssClass = 'chat-draw-card';
+//  TODO preguntar Raul si esta funcion no deberia ser un private de la class UIManagerVanilla
+
+const renderInChat = (msg: string, cssClass: string) => {
+  // const message = `<i class="far fa-hand-paper"></i> ${playerName} draw a ${card.value} of ${card.suit}`;
+
+  // const cssClass = 'chat-draw-card';
   const chatDiv = document.getElementById('chat');
   if (chatDiv) {
     const div: any = document.createElement('div');
     div.classList = `chat-log ${cssClass}`;
-    div.innerHTML = message;
+    div.innerHTML = msg;
 
     chatDiv.insertBefore(div, chatDiv.firstChild);
   }
@@ -45,25 +48,76 @@ export class UIManagerVanilla implements UIManager {
 
   async onDrawCard() {
     const player = await this.game.drawCard();
-    // TODO this.updateTotalScore();
-    // TODO this.checkIfPlayerBusted();
-    // TODO this.renderPlayerScore(); // we need to check if it has busted first!
-    // TODO this.finishTurnIfBusted();
+    player.calculateTotalScore();
+    player.checkIfBusted();
     this.renderCards(player);
-    // this.renderCards(newCardOrCards);
+    this.renderPlayerScore(player);
+    this.finishTurnIfBusted(player);
+    await this.canPlayDealerHand();
+    this.canCheckWinners();
     // this.renderGameLog(newCardOrCards);
   }
 
-  onEndTurn() {
+  private canCheckWinners() {
+    const winners = this.game.canCheckWinners();
+
+    if (winners) {
+      console.log(winners);
+      for (const winner of winners) {
+        renderInChat(`<i class="fas fa-trophy"></i> ${winner.name} won with a score of ${winner.score}`, 'chat-winner');
+      }
+    }
   }
 
+  private finishTurnIfBusted = (player: Player) => {
+    this.game.finishTurnIfBusted();
+    // console.log('UIManager finishTurnIfBusted() player:', player);
+
+    if (player.isBusted) {
+      renderInChat(`<i class="fas fa-bomb"></i> ${player.name} busted! :(`, 'chat-busted');
+    }
+
+    // const message = `<i class="far fa-hand-paper"></i> ${playerName} draw a ${card.value} of ${card.suit}`;
+  };
+
+  private canPlayDealerHand = async () => {
+    const dealer = await this.game.canPlayDealerHand();
+
+    if (dealer) {
+      this.renderCards(dealer);
+      this.renderPlayerScore(dealer);
+    }
+  };
+
+  async onEndTurn() {
+    const player = await this.game.finishTurn();
+
+    renderInChat(`<i class="fas fa-forward"></i> ${player.name} finished his turn.`, 'chat-finish-turn');
+    await this.canPlayDealerHand();
+    this.canCheckWinners();
+  }
+
+  // TODO: ESTA ES PARA MILAN
   onRestartGame() {
+    // cleanUp Chat
+    // cleanUp Cards
+    //
   }
 
   private renderCards = (owner: Player) => {
     const playerCardDiv = document.getElementById(`player-${owner.id}-cards`);
     if (playerCardDiv) {
-      owner.cards.filter(isDirty).forEach(renderCard(playerCardDiv));
+      owner.cards.filter(isDirty).forEach(card => {
+        renderCard(playerCardDiv)(card);
+        renderInChat(`<i class="far fa-hand-paper"></i> ${owner.name} draw a ${card.value} of ${card.suit}`, 'chat-draw-card');
+      });
+    }
+  };
+
+  private renderPlayerScore = (owner: Player) => {
+    const playerScoreDiv = document.getElementById(`player-${owner.id}-score`);
+    if (playerScoreDiv) {
+      playerScoreDiv.innerHTML = owner.isBusted ? 'Busted' : `${owner.score}`;
     }
   };
 
@@ -74,5 +128,9 @@ export class UIManagerVanilla implements UIManager {
 
   renderPlayers(players: Player[]) {
     players.forEach(player => this.renderCards(player));
+  }
+
+  renderScores(players: Player[]) {
+    players.forEach(player => this.renderPlayerScore(player));
   }
 }

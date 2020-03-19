@@ -7,6 +7,9 @@ import { Card } from './Card';
 Testing private methods
 https://stackoverflow.com/questions/35987055/how-to-write-unit-testing-for-angular-typescript-for-private-methods-with-jasm
 */
+
+const isNotDealer = player => !player.isDealer;
+
 export class Game {
   private deckService: DeckService;
 
@@ -15,7 +18,7 @@ export class Game {
   deck: any;
   numOfPlayers: number;
   isFinished: boolean;
-  winners: [];
+  winners: Player[];
 
   constructor(numOfPlayers: number, deckService: DeckService) {
     this.numOfPlayers = numOfPlayers;
@@ -67,56 +70,44 @@ export class Game {
     return player;
   };
 
-  finishTurnIfBusted = async () => {
+  finishTurnIfBusted = () => {
     if (this.players[this.lastPlayerIndex].isBusted) {
       this.finishTurn();
-      await this.canPlayDealerHand();
-      this.checkWinners();
     }
   };
 
-  private finishTurn = () => {
-    if (!this.isFinished) {
+  finishTurn = (): Player => {
+    const playerFinishedTurn = this.players[this.lastPlayerIndex];
+
+    if (!this.isFinished && this.lastPlayerIndex <= this.players.length) {
       this.lastPlayerIndex++;
     }
+    return playerFinishedTurn;
   };
 
-  private canPlayDealerHand = async () => {
+  // is turn of Dealer?
+  canPlayDealerHand = async () => {
     if (this.lastPlayerIndex === this.numOfPlayers) {
-      // console.log('executing dealerFinalHand()');
-      while (this.players[this.numOfPlayers].score < 17) {
-        await this.drawCardLogic();
+      const dealer = this.players[this.lastPlayerIndex];
+      while (dealer.score < 17) {
+        const newCards = await this.deckService.getCardFromApi(this.deck.deckId, 1);
+        dealer.addCardToHand(newCards);
+        dealer.calculateTotalScore();
+        dealer.checkIfBusted();
       }
-      this.checkWinners();
+      // No deberia terminar el turno aqui?
+      // this.checkWinners();
+      return dealer;
     }
   };
 
-  private checkIfPlayerBusted = () => {
-    const player = this.players[this.lastPlayerIndex];
-    if (player.checkIfBusted()) {
-      this.renderInChat(`<i class="fas fa-bomb"></i> ${player.name} busted! :(`, 'chat-busted');
-    }
-  };
-
-  private updateTotalScore = () => {
-    this.players[this.lastPlayerIndex].calculateTotalScore();
-  };
-  
-  drawCardLogic = async () => {
-    await this.drawCard();
-    this.updateTotalScore();
-    this.checkIfPlayerBusted();
-    this.renderPlayerScore(); // we need to check if it has busted first!
-    this.finishTurnIfBusted();
-  };
-
-  checkWinners = () => {
+  canCheckWinners = () => {
+    // TODO: PREGUNTAR RAUL PORQUE SI PONEMOS PLAYER[] CANTA EL LINTER
     if (this.lastPlayerIndex >= this.numOfPlayers && !this.isFinished) {
       console.log('checkingForWinners...');
       const dealer = this.players[this.numOfPlayers];
 
-      for (let i = 0; i < this.numOfPlayers; i++) {
-        const player = this.players[i];
+      for (const player of this.players.filter(isNotDealer)) {
         if (player.score > dealer.score && !dealer.isBusted && !player.isBusted) {
           console.log('winner', player);
           this.winners.push(player);
@@ -128,43 +119,8 @@ export class Game {
         this.winners.push(dealer);
       }
       console.log('Ganadores', this.winners);
-      this.renderWinners();
       this.isFinished = true;
+      return this.winners;
     }
   };
-
-  async finishTurnFromUI() {
-    if (!this.isFinished) {
-      const player = this.players[this.lastPlayerIndex];
-      this.renderInChat(`<i class="fas fa-forward"></i> ${player.name} finished his turn.`, 'chat-finish-turn');
-
-      this.finishTurn();
-      await this.canPlayDealerHand();
-      this.checkWinners();
-    }
-  }
-
-  async drawCardFromUI() {
-    this.drawCardLogic();
-  }
-
-  private renderPlayerScore = () => {
-    // si el indice es el ultimo hay que devolver dealer para encontrar el div por ID
-    const playerIdentifier = this.players[this.lastPlayerIndex].isDealer ? 'dealer' : this.lastPlayerIndex;
-
-    const playerScoreDiv = document.getElementById(`player-${playerIdentifier}-score`);
-    if (playerScoreDiv) {
-      playerScoreDiv.innerHTML = this.players[this.lastPlayerIndex].isBusted ? 'Busted' : this.players[this.lastPlayerIndex].score;
-    }
-  };
-
-  private renderWinners = () => {
-    this.winners.forEach(winner => {
-      this.renderInChat(`<i class="fas fa-trophy"></i> ${winner.name} won with a score of ${winner.score}`, 'chat-winner');
-    });
-  };
-
-  private renderInChat(s: string, chatFinishTurn: string) {
-    console.log('TODO', s, chatFinishTurn);
-  }
 }

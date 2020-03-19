@@ -4,9 +4,9 @@ import { UIManagerVanilla } from './ui/UIManagerVanilla';
 import { DeckCacheService } from './deck/DeckCacheService';
 
 export const initGame = async () => {
-  // const deckService = new DeckAPIService();
+  const deckService = new DeckAPIService();
   // const deckService = new DeckCacheService();
-  const deckService = new DeckSlackService();
+  // const deckService = new DeckSlackService();
 
   const game = new Game(4, deckService);
 
@@ -14,6 +14,7 @@ export const initGame = async () => {
 
   await game.initGame();
   uiManager.renderPlayers(game.players);
+  uiManager.renderScores(game.players);
 
   // drawCardButton(game);
   // endTurnButton(game);

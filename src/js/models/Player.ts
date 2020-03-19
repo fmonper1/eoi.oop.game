@@ -16,12 +16,12 @@ export class Player {
   }
 
   addCardToHand = cards => {
-    console.log('cards', cards);
+    // console.log('cards', cards);
 
     cards.forEach(card => {
       this.cards.push(card);
     });
-    console.log('this after adding card', this);
+    // console.log('player.addCardToHand() after adding card', this);
   };
 
   calculateTotalScore = () => {
