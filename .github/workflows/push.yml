@@ -7,7 +7,7 @@ jobs:
     steps:
       - id: firstStep
         name: Hola mundo
-        uses: fmonper1@cice-action-pruba@master
+        uses: fmonper1/cice-action-pruba@master
         with:
           persona: 'Cice'
       - name: Imprima la hora actual
