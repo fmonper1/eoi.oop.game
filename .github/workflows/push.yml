@@ -4,7 +4,7 @@ jobs:
   build:
     name: Hola Mundo
     runs-on: ubuntu-latest
-    step:
+    steps:
       - id: firstStep
         name: Hello world
         user: actions/hello-world-javascript-action@v1
