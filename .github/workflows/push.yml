@@ -6,9 +6,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: firstStep
-        name: Hello world
-        uses: actions/hello-world-javascript-action@v1
+        name: Hola mundo
+        uses: fmonper1@cice-action-pruba@master
         with:
-          who-to-greet: 'Cice'
+          persona: 'Cice'
       - name: Imprima la hora actual
-        run: echo 'La hore es ${{ steps.firsStep.outputs.time }}'
+        run: echo 'La hora es ${{ steps.firstStep.outputs.hora }}'
