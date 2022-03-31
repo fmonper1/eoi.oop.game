@@ -1,0 +1,14 @@
+name: Primer Workflow (push)
+on: [push]
+jobs:
+  build:
+    name: Hola Mundo
+    runs-on: ubuntu-latest
+    step:
+      - id: firstStep
+        name: Hello world
+        user: actions/hello-world-javascript-action@v1
+        with:
+          who-to-greet: 'Cice'
+      - name: Imprima la hora actual
+        run: echo 'La hore es ${{ steps.firsStep.outputs.time }}'
